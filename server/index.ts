@@ -1,13 +1,13 @@
 import { resolve } from "path";
 import * as protoloder from "@grpc/proto-loader";
 import * as grpc from "@grpc/grpc-js";
-import { ProtoGrpcType } from "../proto/hello";
-import { HelloRequest } from "../proto/helloPackage/HelloRequest";
-import { HelloReply } from "../proto/helloPackage/HelloReply";
+import type { ProtoGrpcType } from "../proto/hello";
+import type { HelloServiceHandlers } from "../proto/helloPackage/HelloService";
 
 //设置端口
 const PORT = 8080;
 // 设置protobuf文件路径
+//动态加载protobuf文件
 const PROTO_PATH = resolve(__dirname, "../proto/hello.proto");
 // options
 const options = {
@@ -23,7 +23,7 @@ const packageDefinition = protoloder.loadSync(PROTO_PATH, options);
 const helloPackage = (grpc.loadPackageDefinition(packageDefinition) as unknown as ProtoGrpcType ).helloPackage;
 
 
-const sayHello: grpc.handleUnaryCall<HelloRequest, HelloReply> = (
+const sayHello: HelloServiceHandlers["SayHello"] = (
   call,
   callback
 ) => {
@@ -38,6 +38,7 @@ const server = new grpc.Server();
 server.addService(helloPackage.HelloService.service, {
   sayHello,
 });
+// 绑定端口
 server.bindAsync(
   `localhost:${PORT}`,
   // 不使用ssl

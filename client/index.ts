@@ -26,6 +26,7 @@ const helloPackage = (
 // 创建客户端
 const client = new helloPackage.HelloService(
   `localhost:${PORT}`,
+  //不使用ssl
   grpc.credentials.createInsecure()
 );
 const deadline = new Date();
